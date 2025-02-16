@@ -1,0 +1,22 @@
+{
+  "name": "cfg-parser",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Context free grammar parser based on Earley parsing",
+  "main": "index.js",
+  "imports": {
+    "#src/*": [
+      "./src/*"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chalarangelo/cfg-parser.git"
+  },
+  "author": "Angelos Chalaris",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Chalarangelo/cfg-parser/issues"
+  },
+  "homepage": "https://github.com/Chalarangelo/cfg-parser#readme"
+}
