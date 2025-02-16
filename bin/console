@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+import repl from 'node:repl';
+import Tokenizer from '#src/tokenizer.js';
+import CFG from '#src/cfg.js';
+import Rule from '#src/rule.js';
+import Sym from '#src/sym.js';
+
+// Start the REPL server
+const replServer = repl.start();
+// Set up a history file for the REPL
+replServer.setupHistory('repl.log', () => {});
+
+// Make the classes available to the REPL
+replServer.context.Tokenizer = Tokenizer;
+replServer.context.CFG = CFG;
+replServer.context.Rule = Rule;
+replServer.context.Sym = Sym;
+
+Sym.define('E', 'op', 'int');
+const rules = [
+  new Rule(Sym.E, [Sym.int]),
+  new Rule(Sym.E, [Sym.E, Sym.op, Sym.E]),
+  new Rule(Sym.op, ['+']),
+  new Rule(Sym.int, [/\d+/]),
+];
+const cfg = new CFG(rules);
+const tokenizer = new Tokenizer(cfg);
+// tokenizer.tokenize('1+2+3');
+
+replServer.context.tokenize = input => {
+  return tokenizer.tokenize(input);
+};
