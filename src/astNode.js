@@ -8,8 +8,16 @@ class ASTNode {
       typeof children[0] === 'string'
     ) {
       this.value = children[0];
+
+      this.evaluate = item.evaluate
+        ? () => item.evaluate(this.value)
+        : () => this.value;
     } else {
       this.children = children.map(child => new ASTNode(child));
+
+      this.evaluate = item.evaluate
+        ? () => item.evaluate(this.children.flatMap(child => child.evaluate()))
+        : () => this.children.flatMap(child => child.evaluate());
     }
   }
 }
