@@ -1,8 +1,8 @@
-import Sym from './sym.js';
 import Rule from './rule.js';
 
 class CFG {
-  #rules = new Map();
+  #rules = [];
+  #symbols = new Set();
 
   constructor(rules) {
     if (!Array.isArray(rules) || !rules.length)
@@ -15,15 +15,20 @@ class CFG {
     if (!(rule instanceof Rule))
       throw new TypeError('Rule must be an instance of Rule');
 
-    this.#rules.set(rule.leftHandSide, rule);
+    this.#rules.push(rule);
+    this.#symbols.add(rule.leftHandSide);
   }
 
   get symbols() {
-    return new Set(this.#rules.keys());
+    return this.#symbols;
+  }
+
+  hasSymbol(symbol) {
+    return this.#symbols.has(symbol);
   }
 
   get rules() {
-    return this.#rules.values();
+    return this.#rules;
   }
 
   get tokenMatchers() {
