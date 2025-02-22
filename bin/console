@@ -4,6 +4,7 @@ import Tokenizer from '#src/tokenizer.js';
 import CFG from '#src/cfg.js';
 import Rule from '#src/rule.js';
 import Sym from '#src/sym.js';
+import EarleyParser from '#src/earleyParser.js';
 
 // Start the REPL server
 const replServer = repl.start();
@@ -16,17 +17,35 @@ replServer.context.CFG = CFG;
 replServer.context.Rule = Rule;
 replServer.context.Sym = Sym;
 
-Sym.define('E', 'op', 'int');
+Sym.define(
+  'Expression',
+  'Operator',
+  'Term',
+  'ParenthesesOpen',
+  'ParenthesesClose'
+);
 const rules = [
-  new Rule(Sym.E, [Sym.int]),
-  new Rule(Sym.E, [Sym.E, Sym.op, Sym.E]),
-  new Rule(Sym.op, ['+']),
-  new Rule(Sym.int, [/\d+/]),
+  new Rule(Sym.Expression, [Sym.Term]),
+  new Rule(Sym.Expression, [Sym.Expression, Sym.Operator, Sym.Expression]),
+  new Rule(Sym.Operator, [/[\+\-\*\/]/]),
+  new Rule(Sym.Term, [/\d+/]),
+  new Rule(Sym.Term, [
+    Sym.ParenthesesOpen,
+    Sym.Expression,
+    Sym.ParenthesesClose,
+  ]),
+  new Rule(Sym.ParenthesesOpen, ['(']),
+  new Rule(Sym.ParenthesesClose, [')']),
 ];
 const cfg = new CFG(rules);
 const tokenizer = new Tokenizer(cfg);
+const parser = new EarleyParser(cfg, Sym.E);
 // tokenizer.tokenize('1+2+3');
 
 replServer.context.tokenize = input => {
   return tokenizer.tokenize(input);
+};
+
+replServer.context.parse = input => {
+  return parser.parse(input);
 };
