@@ -26,21 +26,35 @@ Sym.define(
 );
 const rules = [
   new Rule(Sym.Expression, [Sym.Term]),
-  new Rule(Sym.Expression, [Sym.Expression, Sym.Operator, Sym.Expression]),
-  new Rule(Sym.Operator, [/[\+\-\*\/]/]),
-  new Rule(Sym.Term, [/\d+/]),
-  new Rule(Sym.Term, [
-    Sym.ParenthesesOpen,
+  new Rule(
     Sym.Expression,
-    Sym.ParenthesesClose,
-  ]),
+    [Sym.Expression, Sym.Operator, Sym.Expression],
+    (left, operator, right) => {
+      switch (operator) {
+        case '+':
+          return left + right;
+        case '-':
+          return left - right;
+        case '*':
+          return left * right;
+        case '/':
+          return left / right;
+      }
+    }
+  ),
+  new Rule(Sym.Operator, [/[\+\-\*\/]/]),
+  new Rule(Sym.Term, [/\d+/], token => Number.parseFloat(token)),
+  new Rule(
+    Sym.Term,
+    [Sym.ParenthesesOpen, Sym.Expression, Sym.ParenthesesClose],
+    (open, expression, close) => expression
+  ),
   new Rule(Sym.ParenthesesOpen, ['(']),
   new Rule(Sym.ParenthesesClose, [')']),
 ];
 const cfg = new CFG(rules);
 const tokenizer = new Tokenizer(cfg);
 const parser = new EarleyParser(cfg, Sym.E);
-// tokenizer.tokenize('1+2+3');
 
 replServer.context.tokenize = input => {
   return tokenizer.tokenize(input);
