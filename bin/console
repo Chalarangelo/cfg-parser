@@ -6,6 +6,8 @@ import Rule from '#src/rule.js';
 import Sym from '#src/sym.js';
 import EarleyParser from '#src/earleyParser.js';
 
+import { rules, cfg, tokenizer, parser } from '#src/samples/math.js';
+
 // Start the REPL server
 const replServer = repl.start();
 // Set up a history file for the REPL
@@ -16,50 +18,19 @@ replServer.context.Tokenizer = Tokenizer;
 replServer.context.CFG = CFG;
 replServer.context.Rule = Rule;
 replServer.context.Sym = Sym;
-
-Sym.define(
-  'Expression',
-  'Operator',
-  'Term',
-  'ParenthesesOpen',
-  'ParenthesesClose'
-);
-const rules = [
-  new Rule(Sym.Expression, [Sym.Term]),
-  new Rule(
-    Sym.Expression,
-    [Sym.Expression, Sym.Operator, Sym.Expression],
-    (left, operator, right) => {
-      switch (operator) {
-        case '+':
-          return left + right;
-        case '-':
-          return left - right;
-        case '*':
-          return left * right;
-        case '/':
-          return left / right;
-      }
-    }
-  ),
-  new Rule(Sym.Operator, [/[\+\-\*\/]/]),
-  new Rule(Sym.Term, [/\d+/], token => Number.parseFloat(token)),
-  new Rule(
-    Sym.Term,
-    [Sym.ParenthesesOpen, Sym.Expression, Sym.ParenthesesClose],
-    (open, expression, close) => expression
-  ),
-  new Rule(Sym.ParenthesesOpen, ['(']),
-  new Rule(Sym.ParenthesesClose, [')']),
-];
-const cfg = new CFG(rules);
-const tokenizer = new Tokenizer(cfg);
-const parser = new EarleyParser(cfg, Sym.E);
+replServer.context.EarleyParser = EarleyParser;
 
 replServer.context.tokenize = input => {
   return tokenizer.tokenize(input);
 };
 
 replServer.context.parse = input => {
-  return parser.parse(input);
+  const tokens = tokenizer.tokenize(input);
+  return parser.parse(tokens);
+};
+
+replServer.context.evaluate = input => {
+  const tokens = tokenizer.tokenize(input);
+  const parseTree = parser.parse(tokens);
+  return parseTree.evaluate();
 };
