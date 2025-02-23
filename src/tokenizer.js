@@ -4,6 +4,9 @@ class Tokenizer {
   #tokenMatchers;
 
   constructor(cfg) {
+    if (!(cfg instanceof CFG))
+      throw new TypeError('CFG must be a context-free grammar');
+
     this.#tokenMatchers = cfg.tokenMatchers;
   }
 
