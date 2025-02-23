@@ -10,7 +10,7 @@ class ASTNode {
       this.value = children[0];
 
       this.evaluate = item.evaluate
-        ? () => item.evaluate(this.value)
+        ? () => item.evaluate([this.value])
         : () => this.value;
     } else {
       this.children = children.map(child => new ASTNode(child));
