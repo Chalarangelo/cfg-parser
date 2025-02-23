@@ -1,7 +1,7 @@
 # cfg-parser
 Context free grammar parser based on Earley parsing
 
-## How to us
+## How to use
 
 Allow the `console` script to be executed:
 
